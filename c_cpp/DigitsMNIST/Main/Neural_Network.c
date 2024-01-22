@@ -375,37 +375,23 @@ void gradient_descent(PMatrix X, PMatrix Y, double precision, int iterations, PP
 			return;
 		}
 
+		printf("\nforward_prop...");
+		fflush(stdout);
 		forward_prop(p1, p2, X, Z1, A1, Z2, A2);
+		printf("DONE\n");
+		fflush(stdout);
+
+		printf("\nbackward_prop...");
+		fflush(stdout);
 		backward_prop(Z1, A1, Z2, A2, p1->W, p2->W, X, Y, dp1, dp2);
-		update_params(p1, p2, dp1, dp2, precision);
+		printf("DONE\n");
+		fflush(stdout);
 
-		//printf("Z1 ");
-		//shape(Z1);
-		//printf(": \n");
-		//print_matrix(Z1);
-
-		//printf("A1 ");
-		//shape(A1);
-		//printf(": \n");
-		//print_matrix(A1);
-
-		//printf("Z2 ");
-		//shape(Z2);
-		//printf(": \n");
-		//print_matrix(Z2);
-
-		//printf("A2 ");
-		//shape(A2);
-		//printf(": \n");
-		//print_matrix(A2);
-		
-		//print_params(*pp1);
-		//
-		//print_params(*pp2);
-
-		//print_params(dp1);
-
-		//print_params(dp2);
+		printf("\nupdate_params...");
+		fflush(stdout);
+		update_params(p1, p2, dp1, dp2, precision);;
+		printf("DONE\n");
+		fflush(stdout);
 
 		if (i % 10 == 0) {
 
@@ -415,7 +401,7 @@ void gradient_descent(PMatrix X, PMatrix Y, double precision, int iterations, PP
 			prediction = get_prediction(A2);
 			accuracy = get_accuracy(prediction, Y);
 
-			printf("accuracy : %lf\n", accuracy);
+			printf("accuracy : %.15lf\n", accuracy);
 			fflush(stdout);
 
 			free(prediction);

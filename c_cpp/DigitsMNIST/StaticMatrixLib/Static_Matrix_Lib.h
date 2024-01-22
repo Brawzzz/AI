@@ -163,7 +163,7 @@ PMatrix*    get_column_vectors(PMatrix m);
 PMatrix*    get_column_range(PMatrix m, int start_index, int end_index);
 
 //=============== Return a specific column vector of a matrix ===============//
-PMatrix     get_column(PMatrix m, int column_index);
+void        get_column(PMatrix m, int column_index, PMatrix column_i);
 
 //=============== Return the rows vectors of a matrix ===============//
 PMatrix*    get_row_vectors(PMatrix m);
@@ -172,13 +172,13 @@ PMatrix*    get_row_vectors(PMatrix m);
 PMatrix*    get_row_range(PMatrix m, int start_index, int end_index);
 
 //=============== Return a specific row vector of a matrix ===============//
-void get_row(PMatrix m, int row_index, PMatrix row_i);
+void        get_row(PMatrix m, int row_index, PMatrix row_i);
 
 //=============== Fill a matrix with given row matrixes ===============//
-PMatrix     insert_rows(PMatrix* row_matrixes, int width, int length);
+void        insert_rows(PMatrix* row_matrixes, int width, int length, PMatrix new_m);
 
 //=============== Fill a matrix with given column matrixes ===============//
-PMatrix     insert_columns(PMatrix* column_matrixes, int height, int length);
+void        insert_columns(PMatrix* column_matrixes, int height, int length, PMatrix new_m);
 
 //=============== Truncate a matrix by removing the row with index "row" ===============//
 //=================       and the coluumn with index "column"       ===================//

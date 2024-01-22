@@ -76,7 +76,7 @@ void normalize_data(PMatrix datas, double min, double max, double new_min, doubl
 	return;
 }
 
-void train_set(PMatrix datas, int nb_train_examples, PMatrix* X_train, PMatrix* Y_train) {
+void train_set(PMatrix datas, int nb_train_examples, PMatrix X_train, PMatrix Y_train) {
 
 	if (datas == NULL) {
 		error("\n*** Matrix pointing on NULL was given (function : train_set) ***\n", NULL_POINTER_ERROR);
@@ -89,38 +89,29 @@ void train_set(PMatrix datas, int nb_train_examples, PMatrix* X_train, PMatrix* 
 
 	int nb_pixels = DATASET_WIDTH - 1;
 
-	PMatrix X = NULL;
-	PMatrix Y = NULL;
-	PMatrix transpose_X = NULL;
-	PMatrix transpose_Y = NULL;
-
+	PMatrix X = create_matrix(nb_pixels, nb_train_examples, 0);
+	PMatrix Y = create_matrix(1, nb_train_examples, 0);
+	
+	PMatrix labels = create_matrix(1, nb_train_examples, 0);
 	PMatrix train_datas = truncate_matrix(datas, nb_train_examples, 0, 1);
 
 	PMatrix* pixels_columns = get_column_range(train_datas, 1, train_datas->width);
-	PMatrix labels = get_column(train_datas, 0);
 
-	Y = matrix_copy(labels);
-	X = insert_columns(pixels_columns, nb_train_examples, nb_pixels);
+	get_column(train_datas, 0, labels);
+	fill_matrix(Y, labels->tab, nb_train_examples);
+	insert_columns(pixels_columns, nb_train_examples, nb_pixels, X);
 
 	normalize_data(X, 0.f, 255.f, 0.f, 1.f);
 
-	transpose_X = create_matrix(X->height, X->width, 0);
-	transpose(X, transpose_X);
-	
-	transpose_Y = create_matrix(Y->height, Y->width, 0);
-	transpose(Y, transpose_Y);
+	transpose(X, X_train);
+	transpose(Y, Y_train);
 
-	*Y_train = matrix_copy(transpose_Y);
-	*X_train = matrix_copy(transpose_X);
-
+	for (int i = 0; i < nb_pixels; i++){
+		free(pixels_columns[i]);
+		pixels_columns[i] = NULL;
+	}
 	free(pixels_columns);
 	pixels_columns = NULL;
-	
-	free(transpose_Y);
-	transpose_Y = NULL;
-
-	free(transpose_X);
-	transpose_X = NULL;
 
 	free(labels);
 	labels = NULL;
@@ -137,7 +128,7 @@ void train_set(PMatrix datas, int nb_train_examples, PMatrix* X_train, PMatrix* 
 	return;
 }
 
-void dev_set(PMatrix datas, int nb_dev_examples, PMatrix* X_dev, PMatrix* Y_dev) {
+void dev_set(PMatrix datas, int nb_dev_examples, PMatrix X_dev, PMatrix Y_dev) {
 	
 	if (datas == NULL) {
 		error("\n*** Matrix pointing on NULL was given (function : train_set) ***\n", NULL_POINTER_ERROR);
@@ -150,34 +141,32 @@ void dev_set(PMatrix datas, int nb_dev_examples, PMatrix* X_dev, PMatrix* Y_dev)
 
 	int nb_pixels = DATASET_WIDTH - 1;
 
-	PMatrix X = NULL;
-	PMatrix Y = NULL;
-	PMatrix transpose_X = NULL;
-	PMatrix transpose_Y = NULL;
-	PMatrix train_datas = truncate_matrix(datas, nb_dev_examples, 0, 1);
+	PMatrix X = create_matrix(nb_pixels, nb_dev_examples, 0);
+	PMatrix Y = create_matrix(1, nb_dev_examples, 0);
 
-	PMatrix* pixels_columns = get_column_range(train_datas, 1, train_datas->width);
-	PMatrix labels = get_column(train_datas, 0);
+	PMatrix labels = create_matrix(1, nb_dev_examples, 0);
+	PMatrix dev_datas = truncate_matrix(datas, nb_dev_examples, 0, 1);
 
-	Y = matrix_copy(labels);
-	X = insert_columns(pixels_columns, nb_dev_examples, nb_pixels);
+	PMatrix* pixels_columns = get_column_range(dev_datas, 1, dev_datas->width);
 
+	get_column(dev_datas, 0, labels);
+	fill_matrix(Y, labels->tab, nb_dev_examples);
+	insert_columns(pixels_columns, nb_dev_examples, nb_pixels, X);
+
+	normalize_data(X, 0.f, 255.f, 0.f, 1.f);
+
+	transpose(X, X_dev);
+	transpose(Y, Y_dev);
+
+	for (int i = 0; i < nb_pixels; i++) {
+		free(pixels_columns[i]);
+		pixels_columns[i] = NULL;
+	}
 	free(pixels_columns);
 	pixels_columns = NULL;
 
 	free(labels);
 	labels = NULL;
-
-	normalize_data(X, 0.f, 255.f, 0.f, 1.f);
-
-	transpose_X = create_matrix(X->height, X->width, 0);
-	transpose(X, transpose_X);
-
-	transpose_Y = create_matrix(Y->height, Y->width, 0);
-	transpose(Y, transpose_Y);
-
-	*Y_dev = matrix_copy(transpose_Y);
-	*X_dev = matrix_copy(transpose_X);
 
 	free(X);
 	X = NULL;
@@ -185,14 +174,8 @@ void dev_set(PMatrix datas, int nb_dev_examples, PMatrix* X_dev, PMatrix* Y_dev)
 	free(Y);
 	Y = NULL;
 
-	free(transpose_Y);
-	transpose_Y = NULL;
-
-	free(transpose_X);
-	transpose_X = NULL;
-
-	free(train_datas);
-	train_datas = NULL;
+	free(dev_datas);
+	dev_datas = NULL;
 
 	return;
 }

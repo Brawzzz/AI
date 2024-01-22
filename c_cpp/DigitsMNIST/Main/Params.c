@@ -109,7 +109,9 @@ void get_params(const char* params_file_name, PParams p1, PParams p2) {
 	datas = NULL;
 
 	row_range = get_row_range(data_array, 0, W1_WIDTH);
-	data_array_rows = insert_rows(row_range, W1_HEIGHT, W1_WIDTH);
+	data_array_rows = create_matrix(W1_HEIGHT, W1_WIDTH, 0);
+	
+	insert_rows(row_range, W1_HEIGHT, W1_WIDTH, data_array_rows);
 	get_row(data_array, W1_WIDTH, last_row);
 
 	transpose(data_array_rows, p1->W);
@@ -125,7 +127,9 @@ void get_params(const char* params_file_name, PParams p1, PParams p2) {
 	last_row = NULL;
 
 	row_range = get_row_range(data_array, W1_WIDTH+1, FILE_HEIGHT);
-	data_array_rows = insert_rows(row_range, W1_HEIGHT, W2_WIDTH);
+	data_array_rows = create_matrix(W1_HEIGHT, W2_WIDTH, 0);
+
+	insert_rows(row_range, W1_HEIGHT, W2_WIDTH, data_array_rows);
 	get_row(data_array, FILE_HEIGHT - 1, last_row);
 
 	transpose(data_array_rows, p2->W);

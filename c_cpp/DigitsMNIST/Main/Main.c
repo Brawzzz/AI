@@ -145,6 +145,11 @@ int main(int argc, char* argv[]) {
         PParams     p1                  = NULL;
         PParams     p2                  = NULL;
 
+        X_dev = create_matrix(nb_dev_examples, DATASET_WIDTH - 1, 0);
+        Y_dev = create_matrix(nb_dev_examples, 1, 0);
+        X_train = create_matrix(nb_train_examples, DATASET_WIDTH - 1, 0);
+        Y_train = create_matrix(nb_train_examples, 1, 0);
+
         //-------------------------- Import Datas --------------------------//
         printf("- Importing datas...");
         fflush(stdout);
@@ -158,7 +163,7 @@ int main(int argc, char* argv[]) {
         printf("- Shuffle the datas...");
         fflush(stdout);
 
-        data_array = shuffle_rows(data_array);
+        // data_array = shuffle_rows(data_array);
 
         printf("DONE !\n");
         fflush(stdout);
@@ -168,10 +173,10 @@ int main(int argc, char* argv[]) {
         fflush(stdout);
 
         if (USE_TRAIN_SET) {
-            dev_set(data_array, nb_train_examples, &X_train, &Y_train);
+            train_set(data_array, nb_train_examples, X_train, Y_train);
         }
         else{
-            train_set(data_array, nb_dev_examples, &X_dev, &Y_dev);
+            dev_set(data_array, nb_dev_examples, X_dev, Y_dev);
         }
 
         free(data_array);
@@ -262,6 +267,18 @@ int main(int argc, char* argv[]) {
 
         return 0;
     }
+
+    PMatrix a = create_matrix(3, 3, 0);
+    PMatrix b = create_matrix(2, 3, 0);
+    
+    fill_matrix(a, NULL, 2);
+
+    PMatrix* a_cols = get_column_range(a, 1, 3);
+
+    insert_columns(a_cols, 3, 2, b);
+
+    print_matrix(a);
+    print_matrix(b);
 
     return 0;
 }

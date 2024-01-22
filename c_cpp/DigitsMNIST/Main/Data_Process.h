@@ -21,10 +21,10 @@ PMatrix get_train_examples(const char* data_file_name);
 void normalize_data(PMatrix datas, double min, double max, double new_min, double new_max);
 
 //=============== Return a part of the data set that will be used as train set ===============//
-void train_set(PMatrix datas, int nb_train_examples, PMatrix* X_train, PMatrix* Y_train);
+void train_set(PMatrix datas, int nb_train_examples, PMatrix X_train, PMatrix Y_train);
 
 //=============== Return a part of the data set that will be used as dev set ===============//
-void dev_set(PMatrix datas, int nb_dev_examples, PMatrix* X_dev, PMatrix* Y_dev);
+void dev_set(PMatrix datas, int nb_dev_examples, PMatrix X_dev, PMatrix Y_dev);
 
 //=============== Return an example image for a test ===============//
 void get_example(const char* file_name, int example_index, PMatrix* pX, PMatrix* pY);

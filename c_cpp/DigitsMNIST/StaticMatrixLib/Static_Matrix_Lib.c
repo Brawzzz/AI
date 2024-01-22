@@ -807,7 +807,7 @@ PMatrix broadcast(PMatrix m1, PMatrix m2, int* broadcasted_matrix) {
                 m_copy = matrix_copy(m1);
                 column_matrixes[i] = m_copy;
             }
-            broadcast_m = insert_columns(column_matrixes, broadcast_m->height, broadcast_m->width);
+            insert_columns(column_matrixes, broadcast_m->height, broadcast_m->width, broadcast_m);
 
             free(m_copy);
             m_copy = NULL;
@@ -833,7 +833,7 @@ PMatrix broadcast(PMatrix m1, PMatrix m2, int* broadcasted_matrix) {
                 m_copy = matrix_copy(m2);
                 column_matrixes[i] = m_copy;
             }
-            broadcast_m = insert_columns(column_matrixes, broadcast_m->height, broadcast_m->width);
+            insert_columns(column_matrixes, broadcast_m->height, broadcast_m->width, broadcast_m);
 
             free(m_copy);
             m_copy = NULL;
@@ -867,7 +867,7 @@ PMatrix broadcast(PMatrix m1, PMatrix m2, int* broadcasted_matrix) {
                 m_copy = matrix_copy(m1);
                 row_matrixes[i] = m_copy;
             }
-            broadcast_m = insert_rows(row_matrixes, broadcast_m->width, broadcast_m->height);
+            insert_rows(row_matrixes, broadcast_m->width, broadcast_m->height, broadcast_m);
 
             free(m_copy);
             m_copy = NULL;
@@ -893,7 +893,7 @@ PMatrix broadcast(PMatrix m1, PMatrix m2, int* broadcasted_matrix) {
                 m_copy = matrix_copy(m2);
                 row_matrixes[i] = m_copy;
             }
-            broadcast_m = insert_rows(row_matrixes, broadcast_m->width, broadcast_m->height);
+            insert_rows(row_matrixes, broadcast_m->width, broadcast_m->height, broadcast_m);
             
             free(m_copy);
             m_copy = NULL;
@@ -1246,27 +1246,23 @@ PMatrix* get_column_range(PMatrix m, int start_index, int end_index) {
         exit(INT_MIN);
     }
 
-    if ((end_index - start_index) < m->width &&
-        (start_index >= 0 && start_index < m->width) &&
-        (end_index >= 0 && end_index <= m->width) ) {
+    int range = end_index - start_index;
 
-        int range = end_index - start_index;
+    if (range < m->width && range > 0) {
 
-        PMatrix m_copy = NULL;
         PMatrix* column_vectors = get_column_vectors(m);
-
         PMatrix* range_column_vectors = (PMatrix*)malloc(range * sizeof(PMatrix));
         if (range_column_vectors == NULL) {
             error("\n*** allocation error (function : get_column_range) ***\n", ALLOCATION_ERROR);
             exit(INT_MIN);
         }
 
-        for (int i = 0; i < range; i++) {
-            m_copy = matrix_copy(column_vectors[start_index + i]);
-            range_column_vectors[i] = m_copy;
+        for (int i = 0; i < range; i++){
+            range_column_vectors[i] = create_matrix(1, m->height, 0);
+            fill_matrix(range_column_vectors[i], column_vectors[start_index + i]->tab, m->height);
         }
 
-        for (int i = 0; i < m->width; i++){
+        for (int i = 0; i < range; i++){
             free(column_vectors[i]);
             column_vectors[i] = NULL;
         }
@@ -1281,29 +1277,41 @@ PMatrix* get_column_range(PMatrix m, int start_index, int end_index) {
     }
 }
 
-PMatrix get_column(PMatrix m, int column_index) {
+void get_column(PMatrix m, int column_index, PMatrix column_i) {
 
-    if (m == NULL) {
+    if (m == NULL || column_i == NULL) {
         error("\n*** Matrix pointng on NULL was given (function : get_column) ***\n", NULL_POINTER_ERROR);
         exit(INT_MIN);
     }
 
+    if (!is_column(column_i)) {
+        error("\n*** Wrong dimensions for column_i (function : get_column) ***", DIM_ERROR);
+        exit(INT_MIN);
+    }
+    else if (column_i->height != m->height) {
+        error("\n*** Height of column_i is incorrect (function : get_column) ***", DIM_ERROR);
+        exit(INT_MIN);
+    }
+
     if (column_index < m->width && column_index >= 0) {
+
         PMatrix* column_vectors = get_column_vectors(m);
-        PMatrix column = column_vectors[column_index];
+
+        for (int i = 0; i < m->height; i++) {
+            column_i->tab[i] = column_vectors[column_index]->tab[i];
+        }
 
         for (int i = 0; i < m->width; i++) {
             free(column_vectors[i]);
             column_vectors[i] = NULL;
         }
-
         free(column_vectors);
         column_vectors = NULL;
 
-        return column;
+        return;
     }
     else {
-        error("\n*** Segmentation fault : index out of range (function : get_column) ***\n", SEG_FAULT);
+        error("\n*** Segmentation fault : index out of range (function : get_row) ***\n", SEG_FAULT);
         exit(INT_MIN);
     }
 }
@@ -1344,24 +1352,22 @@ PMatrix* get_row_range(PMatrix m, int start_index, int end_index) {
     }
 
     int range = end_index - start_index;
-    int counter = 0;
-
-    if (range < m->height) {
+   
+    if (range < m->height && range > 0) {
 
         PMatrix* row_vectors = get_row_vectors(m);
-
         PMatrix* range_row_vectors = malloc(range * sizeof(PMatrix));
         if (range_row_vectors == NULL) {
             error("\n*** allocation error (function : get_row_range) ***\n", ALLOCATION_ERROR);
             exit(INT_MIN);
         }
 
-        for (int i = start_index; i < end_index; i++) {
-            range_row_vectors[counter] = row_vectors[i];
-            counter++;
+        for (int i = 0; i < range; i++) {
+            range_row_vectors[i] = create_matrix(1, m->height, 0);
+            fill_matrix(range_row_vectors[i], row_vectors[start_index + i]->tab, m->height);
         }
 
-        for (int i = 0; i < m->height; i++) {
+        for (int i = 0; i < range; i++) {
             free(row_vectors[i]);
             row_vectors[i] = NULL;
         }
@@ -1392,7 +1398,7 @@ void get_row(PMatrix m, int row_index, PMatrix row_i) {
         exit(INT_MIN);
     }
 
-    if (row_index < m->height) {
+    if (row_index < m->height && row_index >= 0) {
 
         PMatrix* row_vectors = get_row_vectors(m);
         
@@ -1415,60 +1421,59 @@ void get_row(PMatrix m, int row_index, PMatrix row_i) {
     }
 }
 
-PMatrix insert_rows(PMatrix* row_matrixes, int width, int length) {
+void insert_rows(PMatrix* row_matrixes, int width, int length, PMatrix new_m) {
     
-    if (row_matrixes == NULL) {
+    if (row_matrixes == NULL || new_m == NULL) {
         error("\n*** NULL pointer was given (function : insert_rows) ***\n", NULL_POINTER_ERROR);
+        exit(INT_MIN);
+    }
+    if (new_m->width != width || new_m->height != length) {
+        error("\n*** Incorrect dimension for new_m (function : insert_rows) ***\n", DIM_ERROR);
         exit(INT_MIN);
     }
 
     double value = 0.f;
 
-    PMatrix new_m = create_matrix(width, length, 0);
-
     for (int i = 0; i < length; i++) {
         if (!is_row(row_matrixes[i]) || !row_matrixes[i]->width > width) {
-            error("\n*** row_matrixes[%d] is not a row / or out of width (function : insert_rows) ***\n", SEG_FAULT); 
+            error("\n*** row_matrixes[%d] is not a row / or out of width (function : insert_rows) ***\n", SEG_FAULT);
             exit(INT_MIN);
         }
-    }
-
-    for (int i = 0; i < length; i++) {
         for (int j = 0; j < width; j++) {
             value = row_matrixes[i]->tab[j];
             set_m(new_m, i, j, value);
         }
     }
 
-    return new_m;
+    return;
 }
 
-PMatrix insert_columns(PMatrix* column_matrixes, int height, int length) {
+void insert_columns(PMatrix* column_matrixes, int height, int length, PMatrix new_m) {
 
-    if (column_matrixes == NULL) {
-        error("\n*** NULL pointer was given (function : column_rows) ***\n", NULL_POINTER_ERROR);
+    if (column_matrixes == NULL || new_m == NULL) {
+        error("\n*** NULL pointer was given (function : insert_columns) ***\n", NULL_POINTER_ERROR);
         exit(INT_MIN);
     }
-
+    if (new_m->height != height || new_m->width != length) {
+        error("\n*** Incorrect dimension for new_m (function : insert_columns) ***\n", DIM_ERROR);
+        exit(INT_MIN);
+    }
+    
     double value = 0.f;
 
-    PMatrix new_m = create_matrix(length, height, 0);
-
     for (int i = 0; i < length; i++) {
-        if (!is_column(column_matrixes[i]) || !column_matrixes[i]->height > height) {
-            error("\n*** column_matrixes[%d] is not a column / or out of height (function : column_rows) ***\n", SEG_FAULT);
+
+        if (!is_column(column_matrixes[i]) || column_matrixes[i]->height > height) {
+            error("\n*** column_matrixes[%d] is not a column / or out of height (function : insert_columns) ***\n", SEG_FAULT);
             exit(INT_MIN);
         }
-    }
-
-    for (int i = 0; i < length; i++) {
         for (int j = 0; j < height; j++) {
             value = column_matrixes[i]->tab[j];
             set_m(new_m, j, i, value);
         }
     }
 
-    return new_m;
+    return;
 }
 
 PMatrix truncate_matrix(PMatrix m, int row, int col, int sens) {
