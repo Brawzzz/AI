@@ -1,0 +1,53 @@
+{
+    "train_config": {
+        "TRAIN_MODEL": "TRUE",
+        "TEST_MODEL": "FALSE",
+    
+        "DATA_FILE_PATH": "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/set/train.csv",
+        "PARAMS_FILE_PATH": "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/models/model_1.3",
+    
+        "ITERATIONS": "250",
+        "PRECISION": "0.025",
+    
+        "BOOL_TEST_FILE": "FALSE",
+        "TEST_FILE_PATH": "0",
+    
+        "TEST_INDEX": "-1",
+        "EXAMPLE_INDEX": "-1",
+    
+        "BOOL_EXAMPLE_FILE": "FALSE",
+        "EXAMPLE_FILE_PATH": "0"
+    },
+    "test_config": {
+        "TRAIN_MODEL": "FALSE",
+        "TEST_MODEL": "TRUE",
+
+        "DATA_FILE_PATH": "",
+        "PARAMS_FILE_PATH": "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/models/model_final",
+
+        "ITERATIONS": "-1",
+        "PRECISION": "-1",
+
+        "test": {
+            "BOOL_TEST_FILE": "TRUE",
+            "BOOL_EXAMPLE_FILE": "FALSE",
+
+            "TEST_FILE_PATH": "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/set/test.csv",
+            "EXAMPLE_FILE_PATH": "0",
+
+            "TEST_INDEX": "test_index",
+            "EXAMPLE_INDEX": "-1"
+        },
+
+        "example":{
+            "BOOL_TEST_FILE": "FALSE",
+            "BOOL_EXAMPLE_FILE": "TRUE",
+
+            "TEST_FILE_PATH": "0",
+            "EXAMPLE_FILE_PATH": "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/examples/csv/one.csv",
+
+            "TEST_INDEX": "-1",
+            "EXAMPLE_INDEX": "example_index"
+        }
+    }
+}
