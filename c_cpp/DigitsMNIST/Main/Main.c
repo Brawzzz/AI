@@ -5,10 +5,10 @@
 //-------------------------- DEFINES & CONSTANT --------------------------//
 #define _CRT_SECURE_NO_WARNINGS
 
-const int nb_train_examples = 100;
+const int nb_train_examples = 41000;
 const char* predictions_file = "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/predictions/predictions.csv";
 
-double ACCURACY_MIN = 0.95f;
+double ACCURACY_MIN = 0.90f;
 
 //-------------------------- MAIN --------------------------//
 int main(int argc, char* argv[]) {
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
         fflush(stdout);
 
         ITERATIONS          = 450;
-        PRECISION           = 0.0025f;
+        PRECISION           = 0.01f;
 
         strcpy_s(DATA_FILE_NAME, 100, "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/set/train.csv");
         strcpy_s(PARAMS_FILE_NAME, 100, "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/models/model_1.3.csv");

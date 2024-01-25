@@ -7,7 +7,7 @@
 //-------------------------- DEFINES --------------------------//
 #define MAX_LINE_SIZE 8062
 #define DATASET_WIDTH 785
-#define DATASET_HEIGHT 42000
+#define DATASET_HEIGHT 42050
 
 //-------------------------- INCLUDES --------------------------//
 #include "Static_Matrix_Lib.h"

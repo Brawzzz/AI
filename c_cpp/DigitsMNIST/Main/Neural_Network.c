@@ -351,6 +351,8 @@ void gradient_descent(PMatrix X, PMatrix Y, double precision, int iterations, PP
 	int i = 0;
 
 	while(accuracy < ACCURACY_MIN){
+	
+	//for (int i = 0; i < iterations; i++){
 
 		forward_prop(*p1, *p2, X, Z1, A1, Z2, A2);
 		backward_prop(Z1, A1, Z2, A2, (*p1)->W, (*p2)->W, X, Y, dp1, dp2);
@@ -372,11 +374,6 @@ void gradient_descent(PMatrix X, PMatrix Y, double precision, int iterations, PP
 		i++;
 	}
 	printf("\n\n");
-
-	delete_matrix(dW1);
-	delete_matrix(db1);
-	delete_matrix(dW2);
-	delete_matrix(db2);
 
 	delete_params(dp1);
 	delete_params(dp2);
