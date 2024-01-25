@@ -5,7 +5,7 @@
 #define TABLES_H
 
 //-------------------------- DEFINES --------------------------//
-#define MAX_HEIGHT 784
+#define MAX_HEIGHT 7
 #define MAX_WIDTH 7
 
 //-------------------------- INCLUDES --------------------------//

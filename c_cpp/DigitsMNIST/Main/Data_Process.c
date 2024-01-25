@@ -107,23 +107,15 @@ void train_set(PMatrix datas, int nb_train_examples, PMatrix X_train, PMatrix Y_
 	transpose(Y, Y_train);
 
 	for (int i = 0; i < nb_pixels; i++){
-		free(pixels_columns[i]);
-		pixels_columns[i] = NULL;
+		delete_matrix(pixels_columns[i]);
 	}
 	free(pixels_columns);
 	pixels_columns = NULL;
 
-	free(labels);
-	labels = NULL;
-
-	free(X);
-	X = NULL;
-
-	free(Y);
-	Y = NULL;
-
-	free(train_datas);
-	train_datas = NULL;
+	delete_matrix(labels);
+	delete_matrix(train_datas);
+	delete_matrix(X);
+	delete_matrix(Y);
 
 	return;
 }
@@ -159,23 +151,16 @@ void dev_set(PMatrix datas, int nb_dev_examples, PMatrix X_dev, PMatrix Y_dev) {
 	transpose(Y, Y_dev);
 
 	for (int i = 0; i < nb_pixels; i++) {
-		free(pixels_columns[i]);
-		pixels_columns[i] = NULL;
+		delete_matrix(pixels_columns[i]);
 	}
 	free(pixels_columns);
 	pixels_columns = NULL;
 
-	free(labels);
-	labels = NULL;
-
-	free(X);
-	X = NULL;
-
-	free(Y);
-	Y = NULL;
-
-	free(dev_datas);
-	dev_datas = NULL;
+	delete_matrix(labels);
+	delete_matrix(dev_datas);
+	delete_matrix(X);
+	delete_matrix(Y);
+	
 
 	return;
 }
@@ -256,11 +241,8 @@ void get_example(const char* file_name, int example_index, PMatrix* pX, PMatrix*
 		*pY = matrix_copy(Y);
 	}
 
-	free(X);
-	X = NULL;
-
-	free(Y);
-	Y = NULL;
+	delete_matrix(X);
+	delete_matrix(Y);
 
 	return;
 }

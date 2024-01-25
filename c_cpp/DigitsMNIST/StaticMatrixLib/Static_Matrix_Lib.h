@@ -46,6 +46,9 @@ typedef Args* PArgs;
 //=============== Allocate and Initialize a matrix ===============//
 PMatrix     create_matrix(int width, int heigt, char name);
 
+//=============== Delete completly a Matrix ===============//
+void        delete_matrix(PMatrix m);
+
 //=============== Display a matrix ===============//
 void        print_matrix(PMatrix m);
 
@@ -91,13 +94,13 @@ PMatrix     add_async(PMatrix m1, PMatrix m2);
 void*       add_vectors(void* args);
 
 //=============== Compute the sum of two matrixes sequentially ===============//
-void     add(PMatrix m1, PMatrix m2, PMatrix res);
+void        add(PMatrix m1, PMatrix m2, PMatrix res);
 
 //=============== Compute the difference beteween two matrixes sequentially ===============//
-void sub_m(PMatrix m1, PMatrix m2, PMatrix res);
+void        sub_m(PMatrix m1, PMatrix m2, PMatrix res);
 
 //=============== Add a scalar to each term of m ===============//
-void     PMatrix_add_scalar(PMatrix m, double alpha, PMatrix res);
+void        PMatrix_add_scalar(PMatrix m, double alpha, PMatrix res);
 
 //=============== Compute the product of two matrixes with multi-threading ===============//
 PMatrix     mult_async(PMatrix m1, PMatrix m2);

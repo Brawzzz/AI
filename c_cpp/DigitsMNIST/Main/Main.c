@@ -5,8 +5,10 @@
 //-------------------------- DEFINES & CONSTANT --------------------------//
 #define _CRT_SECURE_NO_WARNINGS
 
-const int nb_train_examples = 40000;
+const int nb_train_examples = 100;
 const char* predictions_file = "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/predictions/predictions.csv";
+
+double ACCURACY_MIN = 0.95f;
 
 //-------------------------- MAIN --------------------------//
 int main(int argc, char* argv[]) {
@@ -38,10 +40,10 @@ int main(int argc, char* argv[]) {
         fflush(stdout);
 
         ITERATIONS          = 450;
-        PRECISION           = 0.01f;
+        PRECISION           = 0.0025f;
 
         strcpy_s(DATA_FILE_NAME, 100, "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/set/train.csv");
-        strcpy_s(PARAMS_FILE_NAME, 100, "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/models/model_1.2.csv");
+        strcpy_s(PARAMS_FILE_NAME, 100, "C:/YA TROP DE CHOSE/AI/ALGORITHM/c_cpp/DigitsMNIST/Main/TEST_DIGITS/models/model_1.3.csv");
 
         TRAIN_MODEL         = TRUE;
         USE_TRAIN_SET       = TRUE;
@@ -163,7 +165,7 @@ int main(int argc, char* argv[]) {
         printf("- Shuffle the datas...");
         fflush(stdout);
 
-        // data_array = shuffle_rows(data_array);
+        data_array = shuffle_rows(data_array);
 
         printf("DONE !\n");
         fflush(stdout);
@@ -179,8 +181,7 @@ int main(int argc, char* argv[]) {
             dev_set(data_array, nb_dev_examples, X_dev, Y_dev);
         }
 
-        free(data_array);
-        data_array = NULL;
+        delete_matrix(data_array);
 
         printf("DONE !\n");
         fflush(stdout);
@@ -190,22 +191,16 @@ int main(int argc, char* argv[]) {
         fflush(stdout);
 
         if (USE_TRAIN_SET) {
-            gradient_descent(X_train, Y_train, PRECISION, ITERATIONS, p1, p2); 
+            gradient_descent(X_train, Y_train, PRECISION, ITERATIONS, &p1, &p2); 
 
-            free(X_train);
-            X_train = NULL;
-
-            free(Y_train);
-            Y_train = NULL;
+            delete_matrix(X_train);
+            delete_matrix(Y_train);
         }
         else {
-            gradient_descent(X_dev, Y_dev, PRECISION, ITERATIONS, p1, p2);
+            gradient_descent(X_dev, Y_dev, PRECISION, ITERATIONS, &p1, &p2);
 
-            free(X_dev);
-            X_dev = NULL;
-
-            free(Y_dev);
-            X_dev = NULL;
+            delete_matrix(X_dev);
+            delete_matrix(Y_dev);
         }
 
         printf("Gradient descent...DONE !\n");
@@ -213,11 +208,8 @@ int main(int argc, char* argv[]) {
 
         save_params(p1, p2, (const char*)PARAMS_FILE_NAME);
 
-        free(p1);
-        p1 = NULL;
-
-        free(p2);
-        p2 = NULL;
+        delete_params(p1);
+        delete_params(p2);
 
         return 0;
     }
@@ -232,8 +224,8 @@ int main(int argc, char* argv[]) {
 
         PMatrix predictions = NULL;
 
-        PParams p1 = new_params();
-        PParams p2 = new_params();
+        PParams p1 = create_params(W1_WIDTH, W1_HEIGHT, b1_WIDTH, b1_HEIGHT);
+        PParams p2 = create_params(W2_WIDTH, W2_HEIGHT, b2_WIDTH, b2_HEIGHT);
         
         get_params(PARAMS_FILE_NAME, p1, p2);
 
@@ -256,29 +248,13 @@ int main(int argc, char* argv[]) {
         print_matrix(predictions);
         save_matrix(predictions, predictions_file, NULL);
 
-        free(p1);
-        p1 = NULL;
+        delete_params(p1);
+        delete_params(p2);
 
-        free(p2);
-        p2 = NULL;
-
-        free(predictions);
-        predictions = NULL;
+        delete_matrix(predictions);
 
         return 0;
     }
-
-    PMatrix a = create_matrix(3, 3, 0);
-    PMatrix b = create_matrix(2, 3, 0);
-    
-    fill_matrix(a, NULL, 2);
-
-    PMatrix* a_cols = get_column_range(a, 1, 3);
-
-    insert_columns(a_cols, 3, 2, b);
-
-    print_matrix(a);
-    print_matrix(b);
 
     return 0;
 }

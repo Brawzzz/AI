@@ -65,7 +65,7 @@ PMatrix get_prediction(PMatrix A2);
 double get_accuracy(PMatrix prediction, PMatrix Y);
 
 //=============== Compute the gradient descent algorithm ===============//
-void gradient_descent(PMatrix X, PMatrix Y, double precision, int iterations, PParams p1, PParams p2);
+void gradient_descent(PMatrix X, PMatrix Y, double precision, int iterations, PParams* p1, PParams* p2);
 
 //=============== Make a prediction on the examples X ===============//
 PMatrix make_prediction(PMatrix X, PParams p1, PParams p2);

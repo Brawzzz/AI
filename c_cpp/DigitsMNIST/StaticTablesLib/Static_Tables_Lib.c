@@ -221,7 +221,7 @@ void shuffle(double* array, size_t n){
 
 	if (n > 1){
 
-		srand(time(NULL));
+		srand((unsigned int)time(NULL));
 
 		for (int i = 0; i < n - 1; i++){
 			size_t j = i + rand() / (RAND_MAX / (n - i) + 1);

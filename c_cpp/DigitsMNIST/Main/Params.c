@@ -3,17 +3,6 @@
 #include "utilities.h"
 
 //-------------------------- FUNCTIONS DEFINITIONS --------------------------//
-PParams new_params() {
-
-	PParams p = (PParams)malloc(sizeof(Params));
-	if (p == NULL) {
-		error("\n*** allocation error (function : new_params) ***\n", ALLOCATION_ERROR);
-	}
-	p->W = NULL;
-	p->b = NULL;
-	
-	return p;
-}
 
 PParams create_params(int W_width, int W_height, int b_width, int b_height) {
 
@@ -26,6 +15,20 @@ PParams create_params(int W_width, int W_height, int b_width, int b_height) {
 	p->b = create_matrix(b_width, b_height, 0);
 
 	return p;
+}
+
+void delete_params(PParams p) {
+
+	if (p == NULL) {
+		printf("\n*** Params already NULL ***\n");
+		return;
+	}
+
+	delete_matrix(p->W);
+	delete_matrix(p->b);
+	p = NULL;
+
+	return;
 }
 
 PParams init_params(int W_width, int W_height, int b_width, int b_height, double min, double max) {
@@ -76,7 +79,7 @@ void get_params(const char* params_file_name, PParams p1, PParams p2) {
 	FILE* params_file = NULL;
 
 	PMatrix data_array = create_matrix(FILE_WIDTH, FILE_HEIGHT, 0);
-	PMatrix last_row = NULL;
+	PMatrix last_row = create_matrix(W1_HEIGHT, 1, 0);
 	PMatrix data_array_rows = NULL;
 	PMatrix* row_range = NULL;
 	
@@ -117,14 +120,14 @@ void get_params(const char* params_file_name, PParams p1, PParams p2) {
 	transpose(data_array_rows, p1->W);
 	transpose(last_row , p1->b);
 
+	for (int i = 0; i < W1_WIDTH; i++){
+		delete_matrix(row_range[i]);
+	}
 	free(row_range);
 	row_range = NULL;
 	
-	free(data_array_rows);
-	data_array_rows = NULL;
-	
-	free(last_row);
-	last_row = NULL;
+	delete_matrix(data_array_rows);
+	delete_matrix(last_row);
 
 	row_range = get_row_range(data_array, W1_WIDTH+1, FILE_HEIGHT);
 	data_array_rows = create_matrix(W1_HEIGHT, W2_WIDTH, 0);
@@ -135,20 +138,15 @@ void get_params(const char* params_file_name, PParams p1, PParams p2) {
 	transpose(data_array_rows, p2->W);
 	transpose(last_row, p2->b);
 
+	for (int i = 0; i < FILE_HEIGHT - (W1_WIDTH + 1); i++) {
+		delete_matrix(row_range[i]);
+	}
 	free(row_range);
 	row_range = NULL;
 
-	free(row_range);
-	row_range = NULL;
-
-	free(data_array_rows);
-	data_array_rows = NULL;
-
-	free(last_row);
-	last_row = NULL;
-
-	free(data_array);
-	data_array = NULL;
+	delete_matrix(data_array_rows);
+	delete_matrix(last_row);
+	delete_matrix(data_array);
 
 	return;
 }
@@ -198,11 +196,8 @@ void save_params(PParams p1, PParams p2, const char* file_name) {
 	save_matrix(transpose_p1_W, file_name, save_file);
 	save_matrix(transpose_p1_b, file_name, save_file);
 	
-	free(transpose_p1_W);
-	transpose_p1_W = NULL;
-
-	free(transpose_p1_b);
-	transpose_p1_b = NULL;
+	delete_matrix(transpose_p1_W);
+	delete_matrix(transpose_p1_b);
 
 	p2->b = broadcast(p1->b, p2->b, &brodcasted_matrix);
 
@@ -215,11 +210,8 @@ void save_params(PParams p1, PParams p2, const char* file_name) {
 	save_matrix(transpose_p2_W, file_name, save_file);
 	save_matrix(transpose_p2_b, file_name, save_file);
 
-	free(transpose_p2_W);
-	transpose_p2_W = NULL;
-
-	free(transpose_p2_b);
-	transpose_p2_b = NULL;
+	delete_matrix(transpose_p2_W);
+	delete_matrix(transpose_p2_b);
 
 	fclose(save_file);
 	save_file = NULL;

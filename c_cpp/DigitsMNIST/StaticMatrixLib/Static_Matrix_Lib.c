@@ -31,6 +31,34 @@ PMatrix create_matrix(int width, int height, char name) {
     return matrix;
 }
 
+void delete_matrix(PMatrix m) {
+
+    if (m == NULL) {
+        printf("\n*** Matrix already NULL ***\n");
+        return;
+    }
+
+    else if (m->tab != NULL) {
+
+        free(m->tab);
+        m->tab = NULL;
+
+        free(m);
+        m = NULL;
+
+        return;
+    }
+
+    else if (m->tab == NULL) {
+        free(m);
+        m = NULL;
+
+        return;
+    }
+
+    return;
+}
+
 void print_matrix(PMatrix m) {
     if (m != NULL) {
        print_tab(m->tab, m->width, m->height, NULL);
@@ -408,8 +436,7 @@ void add(PMatrix m1, PMatrix m2, PMatrix res) {
             }
         }
 
-        free(broadcast_m);
-        broadcast_m = NULL;
+        delete_matrix(broadcast_m);
 
         return;
     }
@@ -422,9 +449,7 @@ void add(PMatrix m1, PMatrix m2, PMatrix res) {
                 set_m(res, i, j, value);
             }
         }
-
-        free(broadcast_m);
-        broadcast_m = NULL;
+        delete_matrix(broadcast_m);
 
         return;
     }
@@ -457,8 +482,7 @@ void sub_m(PMatrix m1, PMatrix m2, PMatrix res) {
                 set_m(res, i, j, value);
             }
         }
-        free(broadcast_m);
-        broadcast_m = NULL;
+        delete_matrix(broadcast_m);
 
         return;
     }
@@ -471,8 +495,7 @@ void sub_m(PMatrix m1, PMatrix m2, PMatrix res) {
                 set_m(res, i, j, value);
             }
         }
-        free(broadcast_m);
-        broadcast_m = NULL;
+        delete_matrix(broadcast_m);
 
         return;
     }
@@ -662,8 +685,7 @@ void kronecker_product(PMatrix m1, PMatrix m2, PMatrix res) {
             }
         }
     }
-    free(m1_ij_m2);
-    m1_ij_m2 = NULL;
+    delete_matrix(m1_ij_m2);
 
     return;
 }
@@ -758,7 +780,6 @@ PMatrix broadcast(PMatrix m1, PMatrix m2, int* broadcasted_matrix) {
     }
 
     PMatrix broadcast_m = NULL;
-    PMatrix m_copy = NULL;
 
     if (is_scalar(m1)) {
 
@@ -802,16 +823,16 @@ PMatrix broadcast(PMatrix m1, PMatrix m2, int* broadcasted_matrix) {
                 error("\n*** allocation error (function : broadcast) ***\n", ALLOCATION_ERROR);
                 exit(INT_MIN);
             }
-
+            
             for (int i = 0; i < m2->width; i++) {
-                m_copy = matrix_copy(m1);
-                column_matrixes[i] = m_copy;
+                column_matrixes[i] = create_matrix(1, m1->height, 0);
+                fill_matrix(column_matrixes[i], m1->tab, m1->height);
             }
             insert_columns(column_matrixes, broadcast_m->height, broadcast_m->width, broadcast_m);
 
-            free(m_copy);
-            m_copy = NULL;
-
+            for (int i = 0; i < m2->width; i++){
+                delete_matrix(column_matrixes[i]);
+            }
             free(column_matrixes);
             column_matrixes = NULL;
 
@@ -830,14 +851,14 @@ PMatrix broadcast(PMatrix m1, PMatrix m2, int* broadcasted_matrix) {
             }
 
             for (int i = 0; i < m1->width; i++) {
-                m_copy = matrix_copy(m2);
-                column_matrixes[i] = m_copy;
+                column_matrixes[i] = create_matrix(1, m2->height, 0);
+                fill_matrix(column_matrixes[i], m2->tab, m2->height);
             }
             insert_columns(column_matrixes, broadcast_m->height, broadcast_m->width, broadcast_m);
 
-            free(m_copy);
-            m_copy = NULL;
-
+            for (int i = 0; i < m1->width; i++) {
+                delete_matrix(column_matrixes[i]);
+            }
             free(column_matrixes);
             column_matrixes = NULL;
 
@@ -864,14 +885,14 @@ PMatrix broadcast(PMatrix m1, PMatrix m2, int* broadcasted_matrix) {
             }
 
             for (int i = 0; i < m2->height; i++){
-                m_copy = matrix_copy(m1);
-                row_matrixes[i] = m_copy;
+                row_matrixes[i] = create_matrix(m1->width, 1, 0);
+                fill_matrix(row_matrixes[i], m1->tab, m1->width);
             }
             insert_rows(row_matrixes, broadcast_m->width, broadcast_m->height, broadcast_m);
 
-            free(m_copy);
-            m_copy = NULL;
-
+            for (int i = 0; i < m2->height; i++) {
+                delete_matrix(row_matrixes[i]);
+            }
             free(row_matrixes);
             row_matrixes = NULL;
 
@@ -890,14 +911,14 @@ PMatrix broadcast(PMatrix m1, PMatrix m2, int* broadcasted_matrix) {
             }
 
             for (int i = 0; i < m1->height; i++){
-                m_copy = matrix_copy(m2);
-                row_matrixes[i] = m_copy;
+                row_matrixes[i] = create_matrix(m2->width, 1, 0);
+                fill_matrix(row_matrixes[i], m2->tab, m2->width);
             }
             insert_rows(row_matrixes, broadcast_m->width, broadcast_m->height, broadcast_m);
-            
-            free(m_copy);
-            m_copy = NULL;
 
+            for (int i = 0; i < m1->height; i++) {
+                delete_matrix(row_matrixes[i]);
+            }
             free(row_matrixes);
             row_matrixes = NULL;
 
@@ -1025,8 +1046,8 @@ double det(PMatrix m) {
             }
             determinant += (pow((-1), (i)) * get_m(m, i, 0)) * det(m_);
 
-            free(m_);
-            m_ = NULL;
+            delete_matrix(m_);
+
         }
 
         return determinant;
@@ -1171,11 +1192,8 @@ PMatrix inverse(PMatrix m) {
 
         mult_by_scalar(transpose_com_m, r, m_);
 
-        free(com_m);
-        com_m = NULL;
-        
-        free(transpose_com_m);
-        transpose_com_m = NULL;
+        delete_matrix(com_m);
+        delete_matrix(transpose_com_m);
 
         return m_;
     }
@@ -1263,8 +1281,7 @@ PMatrix* get_column_range(PMatrix m, int start_index, int end_index) {
         }
 
         for (int i = 0; i < range; i++){
-            free(column_vectors[i]);
-            column_vectors[i] = NULL;
+            delete_matrix(column_vectors[i]);
         }
         free(column_vectors);
         column_vectors = NULL;
@@ -1302,8 +1319,7 @@ void get_column(PMatrix m, int column_index, PMatrix column_i) {
         }
 
         for (int i = 0; i < m->width; i++) {
-            free(column_vectors[i]);
-            column_vectors[i] = NULL;
+            delete_matrix(column_vectors[i]);
         }
         free(column_vectors);
         column_vectors = NULL;
@@ -1363,13 +1379,12 @@ PMatrix* get_row_range(PMatrix m, int start_index, int end_index) {
         }
 
         for (int i = 0; i < range; i++) {
-            range_row_vectors[i] = create_matrix(1, m->height, 0);
-            fill_matrix(range_row_vectors[i], row_vectors[start_index + i]->tab, m->height);
+            range_row_vectors[i] = create_matrix(m->width, 1, 0);
+            fill_matrix(range_row_vectors[i], row_vectors[start_index + i]->tab, m->width);
         }
 
         for (int i = 0; i < range; i++) {
-            free(row_vectors[i]);
-            row_vectors[i] = NULL;
+            delete_matrix(row_vectors[i]);
         }
         free(row_vectors);
         row_vectors = NULL;
@@ -1407,8 +1422,7 @@ void get_row(PMatrix m, int row_index, PMatrix row_i) {
         } 
 
         for (int i = 0; i < m->height; i++) {
-            free(row_vectors[i]);
-            row_vectors[i] = NULL;
+            delete_matrix(row_vectors[i]);
         }
         free(row_vectors);
         row_vectors = NULL;
@@ -1592,15 +1606,10 @@ PMatrix shuffle_rows(PMatrix m) {
     int random_index = 0;
     int shuffled_index = 0;
 
-    PMatrix m_temp = NULL;
-    PMatrix shuffled_matrix = NULL;
+    PMatrix m_row_temp = create_matrix(m->width, 1, 0);
+    PMatrix shuffled_matrix = create_matrix(m->width, m->height, 0);
     
-    PMatrix* m_rows = NULL;
-
-    shuffled_matrix = create_matrix(m->width, m->height, 0);
-    fill_matrix(shuffled_matrix, m->tab, (m->width * m->height));
-
-    m_rows = get_row_vectors(m);
+    PMatrix* m_rows = get_row_vectors(m);
 
     srand((unsigned int)time(NULL));
 
@@ -1608,12 +1617,11 @@ PMatrix shuffle_rows(PMatrix m) {
 
         random_index = rand() % (int)m->height;
 
-        m_temp = m_rows[random_index];
-        m_rows[random_index] = m_rows[i];
-        m_rows[i] = m_temp;
+        fill_matrix(m_row_temp, m_rows[random_index]->tab, m->width);
+        fill_matrix(m_rows[random_index], m_rows[i]->tab, m->width);
+        fill_matrix(m_rows[i], m_row_temp->tab, m->width);
     }
-    free(m_temp);
-    m_temp = NULL;
+    delete_matrix(m_row_temp);
 
     for (int i = 0; i < m->height; i++) {
         for (int j = 0; j < m->width; j++) {
@@ -1622,6 +1630,9 @@ PMatrix shuffle_rows(PMatrix m) {
         }
     }
 
+    for (size_t i = 0; i < m->height; i++){
+        delete_matrix(m_rows[i]);
+    }
     free(m_rows);
     m_rows = NULL;
 
@@ -1661,8 +1672,7 @@ void flatten(PMatrix m, PMatrix flatten_m) {
         }
 
         for (int i = 0; i < m->height; i++){
-            free(m_rows[i]);
-            m_rows[i] = NULL;
+            delete_matrix(m_rows[i]);
         }
         free(m_rows);
         m_rows = NULL;
@@ -1748,7 +1758,7 @@ PMatrix arg_max(PMatrix m, int axis) {
     int max_index = 0;
 
     double value = 0.f;
-    double max = FLT_MIN;
+    double max = DBL_MIN;
 
     PMatrix max_axis = NULL;
 
@@ -1758,7 +1768,7 @@ PMatrix arg_max(PMatrix m, int axis) {
 
         for (int i = 0; i < m->width; i++){
             max_index = 0;
-            max = FLT_MIN;
+            max = DBL_MIN;
             for (int j = 0; j < m->height; j++){
                 value = get_m(m, j, i);
                 if (value > max) {

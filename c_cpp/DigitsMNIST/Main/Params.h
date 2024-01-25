@@ -33,11 +33,11 @@ typedef Params* PParams;
 
 //-------------------------- FUNCTIONS PROTOTYPES --------------------------//
 
-//=============== Return a PParams with W and b NULL ===============//
-PParams new_params();
-
 //=============== Return a PParams and initialize W, b  ===============//
 PParams create_params(int W_width, int W_height, int b_width, int b_height) ;
+
+//=============== Delete completly a Params ===============//
+void delete_params(PParams p);
 
 //=============== Return a PParams which is initialize with random values in [min, max]  ===============//
 PParams init_params(int W_width, int W_height, int b_width, int b_height, double min, double max);
